@@ -1,0 +1,63 @@
+name: recursive_reasoning.ma_trm@MultiAgentTinyRecursiveReasoningModel_ACTV1
+loss:
+  name: losses_ma_trm@MATRMLossHead
+  loss_type: stablemax_cross_entropy
+  halt_weight: 0.5
+  verifier_weight: 0.20
+  improvement_weight: 0.10
+  consistency_weight: 0.05
+  diversity_weight: 0.01
+  routing_balance_weight: 0.01
+  compute_weight: 0.002
+  distillation_weight: 0.10
+
+# Adaptive computation across ACT calls.
+halt_exploration_prob: 0.1
+halt_min_steps: 2
+halt_max_steps: 16
+halt_threshold: 0.0
+disagreement_halt_threshold: 0.025
+stability_halt_threshold: 0.0
+adaptive_eval: true
+eval_halt_granularity: batch
+no_ACT_continue: true
+
+# MA-TRM collaboration schedule.
+H_cycles: 3
+L_cycles: 2
+gradient_rounds: 1
+H_layers: 0
+L_layers: 2
+
+# Shared TRM backbone. This plus low-rank role modules remains about 7M parameters.
+hidden_size: 512
+num_heads: 8
+expansion: 4
+puzzle_emb_ndim: ${.hidden_size}
+pos_encodings: rope
+forward_dtype: bfloat16
+mlp_t: false
+puzzle_emb_len: 16
+
+# Role specialization and latent collaboration.
+num_agents: 4
+role_names: [pattern, transform, critic, verifier]
+verifier_index: 3
+critic_index: 2
+student_index: 0
+topology: sequential
+adapter_rank: 8
+link_rank: 8
+
+# Sparse dynamic routing. Training uses dense masked execution for safe DDP.
+# Evaluation physically executes only the batch-level top-k roles.
+router_hidden_size: 64
+active_agents: 2
+router_temperature: 1.0
+physical_sparse_eval: true
+
+# Cell-level recursive attention.
+cell_attention: true
+cell_attention_threshold: 0.35
+cell_attention_temperature: 0.10
+global_refresh_interval: 2

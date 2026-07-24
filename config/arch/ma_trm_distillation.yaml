@@ -1,0 +1,6 @@
+defaults:
+  - ma_trm_lite
+  - _self_
+
+topology: distillation
+active_agents: 3

@@ -1,0 +1,49 @@
+\documentclass[tikz,border=6pt]{standalone}
+\usepackage{newtxtext,newtxmath}
+\usetikzlibrary{arrows.meta,positioning,fit,calc,shapes.geometric}
+\usepackage{xcolor}
+\definecolor{algred}{RGB}{171,19,30}
+\definecolor{softred}{RGB}{249,232,234}
+\definecolor{softblue}{RGB}{231,240,250}
+\definecolor{softgreen}{RGB}{231,246,237}
+\definecolor{softgold}{RGB}{250,244,222}
+\definecolor{softgray}{RGB}{242,242,242}
+\definecolor{darkgray}{RGB}{55,55,55}
+\tikzset{
+block/.style={draw,rounded corners=2pt,minimum height=8mm,minimum width=20mm,align=center,font=\small,thick},
+smallblock/.style={draw,rounded corners=2pt,minimum height=6mm,minimum width=16mm,align=center,font=\scriptsize},
+arrow/.style={-{Latex[length=2mm]},thick},
+latent/.style={-{Latex[length=2mm]},thick,dashed,algred},
+feedback/.style={-{Latex[length=2mm]},thick,dotted,darkgray},
+group/.style={draw,dashed,rounded corners=3pt,inner sep=5pt}
+}
+\begin{document}
+\begin{tikzpicture}[node distance=6mm and 6mm]
+\node[block,fill=softblue,minimum width=22mm] (input) {input $x$\\candidate $y_t$};
+\node[block,fill=softred,right=of input,minimum width=23mm] (pattern) {pattern agent\\role adapter};
+\node[block,fill=softred,right=of pattern,minimum width=23mm] (transform) {transformation agent\\role adapter};
+\node[block,fill=softred,right=of transform,minimum width=23mm] (critic) {critic agent\\role adapter};
+\node[block,fill=softred,right=of critic,minimum width=23mm] (verify) {verifier agent\\role adapter};
+\node[block,fill=softgreen,below=13mm of transform,minimum width=43mm] (workspace) {shared workspace and answer integrator};
+\node[block,fill=softgold,below=13mm of verify,minimum width=32mm] (halt) {disagreement, confidence,\\change, and halting};
+\node[smallblock,fill=softgray,above=13mm of critic] (router) {sparse dynamic router};
+\node[smallblock,fill=softgray,below=13mm of pattern] (mask) {cell-level\\attention mask};
+\draw[arrow](input)--(pattern);
+\draw[latent](pattern)--node[above,font=\scriptsize]{$R_{12}$}(transform);
+\draw[latent](transform)--node[above,font=\scriptsize]{$R_{23}$}(critic);
+\draw[latent](critic)--node[above,font=\scriptsize]{$R_{34}$}(verify);
+\draw[arrow](pattern)--(workspace);
+\draw[arrow](transform)--(workspace);
+\draw[arrow](critic)--(workspace);
+\draw[arrow](verify)--(workspace);
+\draw[arrow](workspace)--(halt);
+\draw[feedback](halt.east) to[out=0,in=90,looseness=1.35] node[right,font=\scriptsize]{continue if unresolved}(pattern.north);
+\draw[arrow](router)--(pattern);
+\draw[arrow](router)--(transform);
+\draw[arrow](router)--(critic);
+\draw[arrow](router)--(verify);
+\draw[arrow](mask)--(pattern);
+\draw[arrow](mask)--(workspace);
+\node[group,fit=(pattern)(transform)(critic)(verify),label={[font=\scriptsize]above:one shared two-layer backbone with low-rank role adapters}] {};
+\end{tikzpicture}
+\end{document}
