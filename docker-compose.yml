@@ -1,0 +1,17 @@
+services:
+  ma-trm:
+    build: .
+    image: ma-trm:cu126
+    working_dir: /workspace/MA-TRM
+    shm_size: "16gb"
+    volumes:
+      - ./data:/workspace/MA-TRM/data
+      - ./checkpoints:/workspace/MA-TRM/checkpoints
+      - ./benchmarks:/workspace/MA-TRM/benchmarks
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]

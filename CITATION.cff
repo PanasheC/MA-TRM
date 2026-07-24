@@ -1,0 +1,19 @@
+cff-version: 1.2.0
+message: "Please cite the MA-TRM paper and this software if you use this repository."
+title: "MA-TRM: Recursive Multi-Agent Tiny Recursive Models"
+type: software
+authors:
+  - family-names: Chiurunge
+    given-names: Panashe
+year: 2026
+version: 0.1.0
+repository-code: "https://github.com/PanasheC/MA-TRM"
+license: MIT
+preferred-citation:
+  type: article
+  title: "Recursive Multi Agent Tiny Recursive Models for Efficient Latent Space Reasoning"
+  authors:
+    - family-names: Chiurunge
+      given-names: Panashe
+  journal: "Algorithmica: International Journal of Computational Sciences"
+  year: 2026

@@ -1,0 +1,15 @@
+name: ma-trm
+channels:
+  - pytorch
+  - nvidia
+  - conda-forge
+dependencies:
+  - python=3.10.18
+  - pip=25.1
+  - pytorch=2.7.0
+  - pytorch-cuda=12.6
+  - numpy=2.2
+  - pip:
+      - -r requirements-lock.txt
+      - pytest==8.4.1
+      - pytest-cov==6.2.1

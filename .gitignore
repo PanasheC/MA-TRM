@@ -1,0 +1,50 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+.venv/
+venv/
+.env
+
+# Testing and tooling
+.pytest_cache/
+.coverage
+htmlcov/
+.ruff_cache/
+.mypy_cache/
+
+# Training outputs
+data/
+checkpoints/
+wandb/
+outputs/
+multirun/
+*.pt
+*.pth
+*.ckpt
+
+# Benchmark outputs, keep placeholders and documentation
+benchmarks/*.json
+benchmarks/*.jsonl
+benchmarks/*.csv
+benchmarks/*_sha256.txt
+!benchmarks/.gitkeep
+
+# TeX build products
+paper/*.aux
+paper/*.bbl
+paper/*.blg
+paper/*.log
+paper/*.out
+paper/*.fls
+paper/*.fdb_latexmk
+docs/figures/*.aux
+docs/figures/*.log
+docs/figures/*.fls
+docs/figures/*.fdb_latexmk
+
+# Editors and operating systems
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
