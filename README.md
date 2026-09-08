@@ -18,7 +18,7 @@ Tiny recursive models show that a compact network can solve difficult structured
 
 ## Main architecture
 
-MA-TRM maintains an input embedding \(X\), a candidate answer representation \(Y_t\), private role states \(Z_t^{(i)}\), and a shared workspace \(S_t\). For active agent \(i\), the local update is
+MA-TRM maintains an input embedding $X$, a candidate answer representation $Y_t$, private role states $Z_t^{(i)}$, and a shared workspace $S_t$. For active agent $i$, the local update is
 
 $$
 \widetilde{Z}_{t+1}^{(i)} = A_i\left(X, Y_t, Z_t^{(i)}, S_t\right).
@@ -30,7 +30,7 @@ $$
 R_i(h) = h + \sigma\left(g_i(h)\right)W_{i,\mathrm{up}}\,\mathrm{SiLU}\left(W_{i,\mathrm{down}}\,\mathrm{RMSNorm}(h)\right).
 $$
 
-The shared workspace aggregates active messages with router weights \(\alpha_t^{(i)}\):
+The shared workspace aggregates active messages with router weights $\alpha_t^{(i)}$:
 
 $$
 \bar{H}_{t+1}=\sum_{i\in\mathcal{A}_t}\alpha_t^{(i)}R_i\left(\widetilde{Z}_{t+1}^{(i)}\right),
@@ -43,18 +43,18 @@ $$
 The router selects a top-k role subset:
 
 $$
-\mathcal{A}_t=\operatorname{TopK}\left(\operatorname{softmax}(r_\phi(\operatorname{Pool}(S_t))),k\right),
+\mathcal{A}_t=\mathrm{TopK}\left(\mathrm{softmax}(r_\phi(\mathrm{Pool}(S_t))),k\right),
 $$
 
 with the verifier always active. During distributed training, the code computes all roles and applies a straight-through top-k mask. During evaluation, `physical_sparse_eval=true` applies one batch-level top-k mask and executes only those selected roles.
 
 ### Disagreement-driven recursion
 
-Each active role produces a categorical distribution \(P_t^{(i)}\). The model computes Jensen-Shannon disagreement:
+Each active role produces a categorical distribution $P_t^{(i)}$. The model computes Jensen-Shannon disagreement:
 
 $$
 D_t = \frac{1}{|\mathcal{A}_t|}\sum_{i\in\mathcal{A}_t}
-\operatorname{KL}\left(P_t^{(i)}\middle\|\bar{P}_t\right),
+\mathrm{KL}\left(P_t^{(i)}\,\|\,\bar{P}_t\right),
 \qquad
 \bar{P}_t=\frac{1}{|\mathcal{A}_t|}\sum_{i\in\mathcal{A}_t}P_t^{(i)}.
 $$
@@ -63,10 +63,10 @@ The ACT wrapper halts only when the quality head supports completion, disagreeme
 
 ### Cell-level recursive attention
 
-For cell \(q\), normalized predictive entropy defines uncertainty \(u_{t,q}\). Training uses a soft mask and inference uses a hard mask:
+For cell $q$, normalized predictive entropy defines uncertainty $u_{t,q}$. Training uses a soft mask and inference uses a hard mask:
 
 $$
-m_{t,q}=\operatorname{sigmoid}\left(\frac{u_{t,q}-\tau_u}{T_u}\right),
+m_{t,q}=\mathrm{sigmoid}\left(\frac{u_{t,q}-\tau_u}{T_u}\right),
 $$
 
 $$
@@ -112,31 +112,31 @@ The default weights are conservative starting values. All terms, router statisti
 
 ### 1. Parameter overhead
 
-For a shared backbone with \(P_\Theta\) parameters, \(M\) roles, \(L_b\) adapted layers, hidden width \(d\), adapter rank \(r_a\), \(E\) latent links, and link rank \(r_\ell\),
+For a shared backbone with $P_\Theta$ parameters, $M$ roles, $L_b$ adapted layers, hidden width $d$, adapter rank $r_a$, $E$ latent links, and link rank $r_\ell$,
 
 $$
 P_{\mathrm{MA\text{-}TRM}}=P_\Theta+2ML_bdr_a+2Edr_\ell+P_{\mathrm{ctrl}}.
 $$
 
-When \(r_a,r_\ell=o(d)\) and \(M,E,L_b\) remain fixed, the added role and link parameters are lower order than a dense backbone whose layers scale as \(\Omega(L_bd^2)\).
+When $r_a,r_\ell=o(d)$ and $M,E,L_b$ remain fixed, the added role and link parameters are lower order than a dense backbone whose layers scale as $\Omega(L_bd^2)$.
 
 ### 2. Sparse round cost
 
-If one agent evaluation costs \(C_A\), one latent link costs \(C_R\), the controllers cost \(C_C\), and round \(t\) activates \(k_t\) roles, then
+If one agent evaluation costs $C_A$, one latent link costs $C_R$, the controllers cost $C_C$, and round $t$ activates $k_t$ roles, then
 
 $$
 C_{\mathrm{MA\text{-}TRM}}=\sum_{t=1}^{T}\left(k_tC_A+(k_t-1)C_R+C_C\right).
 $$
 
-The dominant active-agent computation relative to a dense \(M\)-role execution is \(\sum_t k_t/(TM)\).
+The dominant active-agent computation relative to a dense $M$-role execution is $\sum_t k_t/(TM)$.
 
 ### 3. Latent projection saving
 
-A low-rank latent handoff costs \(O(Ldr_\ell)\), while a full class-space decode costs \(O(LCd)\). The low-rank learned projection has fewer multiplications when \(r_\ell<C\), subject to hardware and kernel constants.
+A low-rank latent handoff costs $O(Ldr_\ell)$, while a full class-space decode costs $O(LCd)$. The low-rank learned projection has fewer multiplications when $r_\ell<C$, subject to hardware and kernel constants.
 
 ### 4. Sufficient contraction condition
 
-Let \(\Phi\) be one complete collaboration-round map on the joint state. If each active agent and link is Lipschitz continuous, workspace aggregation is nonexpansive, and every active path has a product Lipschitz constant at most \(\kappa<1\), then
+Let $\Phi$ be one complete collaboration-round map on the joint state. If each active agent and link is Lipschitz continuous, workspace aggregation is nonexpansive, and every active path has a product Lipschitz constant at most $\kappa<1$, then
 
 $$
 \|\Phi(\mathcal{S})-\Phi(\mathcal{S}')\|\leq\kappa\|\mathcal{S}-\mathcal{S}'\|.
@@ -146,7 +146,7 @@ Repeated rounds converge to a unique fixed state by the Banach fixed-point theor
 
 ### 5. Expected Hamming error under calibration
 
-If the verifier confidence \(c_{t,q}\) is calibrated for every output cell, then
+If the verifier confidence $c_{t,q}$ is calibrated for every output cell, then
 
 $$
 \mathbb{E}\left[d_H(\hat{y}_t,y^\star)\mid\{c_{t,q}\}\right]
